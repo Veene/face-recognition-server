@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt-nodejs');
 
 const app = express();
 app.use(bodyParser.json())
@@ -23,6 +24,13 @@ const database = {
             joined: new Date()
         }
 
+    ],
+    login: [
+        {
+            id: '987',
+            hash: '',
+            email: ''
+        }
     ]
 }
 
@@ -40,7 +48,11 @@ app.post('/signin', (req,res) => {
 })
 
 app.post('/register', (req, res) => {
-    
+    const { email, name, password } = req.body;
+    bcrypt.hash(req.body.password, null, null, function(err, hash) {
+        console.log(hash)
+        // Store hash in your password DB.
+    });
     database.users.push({
         id: '126',
         name: req.body.name,
@@ -67,7 +79,7 @@ app.get('/profile/:id', (req, res) => {
 })
 
 app.post('/image', (req,res) => {
-    const { id } = req.body;
+    const { id } = req.body; //not super important to have
     let found = false;
     database.users.forEach(user => {
         if(user.id === req.body.id) { // NO MORE PARAMS: just body OR user.id === id (because we destructed const {id} === req.body)
@@ -80,6 +92,18 @@ app.post('/image', (req,res) => {
         res.status(404).json("no such user found");
     }
 })
+
+// bcrypt.hash("bacon", null, null, function(err, hash) {
+//     // Store hash in your password DB.
+// });
+
+// // Load hash from your password DB.
+// bcrypt.compare("bacon", hash, function(err, res) {
+//     // res == true
+// });
+// bcrypt.compare("veggies", hash, function(err, res) {
+//     // res = false
+// });
 
 // /signin --> POST = success OR fail 
 // /register -> POST = user object
